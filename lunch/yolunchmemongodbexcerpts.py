@@ -12,7 +12,7 @@ sessions = db.Sessions
 
 #does user exist
 exists = True
-if not(users.find_one({"facebook_user_ID": facebook_user_ID})):
+if not(users.find_one({"_id": yo_username})):
 	exists = False
 
 
@@ -22,6 +22,7 @@ friends_to_yo = [] #this list should contain the yo_usernames
 user = {
 	"facebook_user_ID": facebook_user_ID,
 	"_id": yo_username,
+	"name": name,
 	"friends_to_yo": friends_to_yo
 }
 users.insert(user)
@@ -45,7 +46,7 @@ for expiredSession in sessions.find({"session_opened": {"$lt": expiredDateTime}}
 
 #Inserting listening session
 listeningSession = {
-	"yo_username": yo_username,
+	"_id": yo_username,
 	"session_opened": datetime.datetime.utcnow()
 }
 sessions.insert(listeningSession);
@@ -54,7 +55,8 @@ sessions.insert(listeningSession);
 friends_to_yo = users.find_one({"_id": yo_username}, {'_id': False, 'friends_to_yo': True})['friends_to_yo']
 active_friends_to_yo = list(friends_to_yo)
 for friendToYo in friends_to_yo:
-	if not(sessions.find_one({"yo_username": friendToYo})):
+	#location criterium as well
+	if not(sessions.find_one({"_id": friendToYo})):
 		active_friends_to_yo.remove(friendToYo)
 
 for listeningFriendToYo in active_friends_to_yo:
@@ -71,7 +73,8 @@ for listeningFriendToYo in active_friends_to_yo:
 #http://www.YoLunch.Me/user1/confirmsLunchWith/user2
 
 #Removing complete listetning session
-sessions.remove({"yo_username" : yo_username})
+sessions.remove({"_id" : user1})
+sessions.remove({"_id" : user2})
 
 #Sending a finalizing Yo to both users
 

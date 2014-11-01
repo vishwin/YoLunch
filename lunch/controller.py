@@ -27,11 +27,11 @@ def register():
 		return render_template('register.html', app_id=app.config['FB_APP'], localhost=app.config['LOCALHOST'])
 
 @app.route('/<user1>/wantsToLunch/<user2>/near/<latitude>/<longitude>')
-def wantsToLunch():
+def wantsToLunch(user1, user2, latitude, longitude):
 	return user1 + ' wantsToLunch ' + user2 + ' near ' + latitude + ' ' + longitude
 
 @app.route('/<user1>/confirmsLunchWith/<user2>')
-def wantsToLunch2():
+def wantsToLunch2(user1, user2):
 	return user1 + ' confirmsLunchWith ' + user2
 
 @app.route('/<user1>/lunches/<user2>')
