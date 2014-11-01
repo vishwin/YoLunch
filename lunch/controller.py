@@ -1,7 +1,7 @@
 from lunch import app
 from flask import request, render_template
-import json
 import requests
+import urllib.parse, datetime
 
 def send_yo(username, link):
 	requests.post('http://api.justyo.co/yo/', data={'api_token': app.config['YO_API'], 'username': username, 'link': link})
@@ -29,9 +29,10 @@ def register():
 		auth=requests.get('https://graph.facebook.com/oauth/access_token', params={'client_id': app.config['FB_APP'], 'client_secret': app.config['FB_APP_SECRET'], 'code': request.args.get('code'), 'redirect_uri': 'http://' + app.config['LOCALHOST'] + '/register'})
 		fb_userdata=requests.get('https://graph.facebook.com/v2.2/me', params=auth.text)
 		users.insert({
+			'_id': request.args.get('state'), # Yo app username
 			'facebook_user_ID': fb_userdata.json()['id'],
-			'_id': request.args.get('state'),
-			'name': fb_userdata.json()['name']
+			'name': fb_userdata.json()['name'],
+			'facebook_token': urllib.parse.parse_qs(auth.text)['access_token'][0]
 		})
 		return 'OK'
 	else:
