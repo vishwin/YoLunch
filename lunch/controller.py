@@ -34,11 +34,7 @@ def wantsToLunch():
 def wantsToLunch2():
 	return user1 + ' confirmsLunchWith ' + user2
 
-@app.route('/<user1>/lunches/<user2>')
-def wantsToLunch3():
-	return user1 + ' lunches ' + user2
-
-@app.route('/<user1>/lunches/<user2>')
+@app.route('/lunches/<user1>/<user2>')
 def wantsToLunch4():
 	return user1 + ' lunches ' + user2
 
