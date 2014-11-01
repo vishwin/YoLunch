@@ -2,10 +2,15 @@ from lunch import app
 from flask import request, render_template
 import json
 import requests
-import pymongo
 
 def send_yo(username, link):
 	requests.post('http://api.justyo.co/yo/', data={'api_token': app.config['YO_API'], 'username': username, 'link': link})
+
+import pymongo
+mongoclient=pymongo.MongoClient()
+db=mongoclient.YoLunchMeDb
+users=db.Users
+sessions=db.Sessions
 
 @app.route('/')
 def tsst():
@@ -15,16 +20,22 @@ def tsst():
 # Yo callback
 def yo():
 	username=request.args.get('username')
-	send_yo(username, 'http://{0}/register'.format(app.config['LOCALHOST']))
+	send_yo(username, 'http://{0}/register?username={1}'.format(app.config['LOCALHOST'], username))
 	return 'OK'
 
 @app.route('/register')
 def register():
-	if request.args.get('code'):
-		auth=requests.get('https://graph.facebook.com/oauth/access_token?client_id={0}&redirect_uri=http://{1}/register&client_secret={2}&code={3}'.format(app.config['FB_APP'], app.config['LOCALHOST'], app.config['FB_APP_SECRET'], request.args.get('code')))
-		return auth.text
+	if request.args.get('code') and request.args.get('state'):
+		auth=requests.get('https://graph.facebook.com/oauth/access_token', params={'client_id': app.config['FB_APP'], 'client_secret': app.config['FB_APP_SECRET'], 'code': request.args.get('code'), 'redirect_uri': 'http://' + app.config['LOCALHOST'] + '/register'})
+		fb_userdata=requests.get('https://graph.facebook.com/v2.2/me', params=auth.text)
+		users.insert({
+			'facebook_user_ID': fb_userdata.json()['id'],
+			'_id': request.args.get('state'),
+			'name': fb_userdata.json()['name']
+		})
+		return 'OK'
 	else:
-		return render_template('register.html', app_id=app.config['FB_APP'], localhost=app.config['LOCALHOST'])
+		return render_template('register.html', app_id=app.config['FB_APP'], localhost=app.config['LOCALHOST'], username=request.args.get('username'))
 
 @app.route('/<user1>/wantsToLunch/<user2>/near/<latitude>/<longitude>')
 def wantsToLunch(user1, user2, latitude, longitude):
