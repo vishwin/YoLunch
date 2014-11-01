@@ -3,7 +3,7 @@ from pymongo import MongoClient
 import datetime
 
 #connect db
-client = MongoClient()
+client = MongoClient('172.26.12.59', 27017)
 db = client.YoLunchMeDb
 
 users = db.Users
@@ -12,7 +12,7 @@ sessions = db.Sessions
 
 #does user exist
 exists = True
-if users.find_one({"facebook_user_ID": facebook_user_ID}) == Null:
+if not(users.find_one({"facebook_user_ID": facebook_user_ID})):
 	exists = False
 
 
@@ -24,20 +24,20 @@ user = {
 	"_id": yo_username,
 	"friends_to_yo": friends_to_yo
 }
-users.insert(user);
+users.insert(user)
 
 
 #updating the list of the friends_to_yo
 friends_to_yo = [] #this list should contain the yo_usernames
 #here comes the fun FB part
 users.update({"_id": yo_username}, 
-	{"$set": {"friends_to_yo": friends_to_yo}});
+	{"$set": {"friends_to_yo": friends_to_yo}})
 
 
 #Removing expired listening sessions
 timedelta = datetime.timedelta(0, 1800)
 expiredDateTime = datetime.datetime.utcnow() - timedelta
-for expiredSession in sessions.find({"session_opened": {$lt: expiredDateTime}}):
+for expiredSession in sessions.find({"session_opened": {"$lt": expiredDateTime}}):
 	sessions.remove(expiredSession)
 
 
@@ -46,17 +46,18 @@ for expiredSession in sessions.find({"session_opened": {$lt: expiredDateTime}}):
 #Inserting listening session
 listeningSession = {
 	"yo_username": yo_username,
-	"session_opened": datetime.datetime.utcnow(),
+	"session_opened": datetime.datetime.utcnow()
 }
 sessions.insert(listeningSession);
 
 #Sending yo to all the friends in the listetning session
-friends_to_yo = users.find_one({"_id": yo_username}, {'_id': False, 'friends_to_yo': True})
+friends_to_yo = users.find_one({"_id": yo_username}, {'_id': False, 'friends_to_yo': True})['friends_to_yo']
+active_friends_to_yo = list(friends_to_yo)
 for friendToYo in friends_to_yo:
-	if sessions.find_one({"yo_username": friendToYo}) == Null:
-		friends_to_yo.remove(friendToYo)
+	if not(sessions.find_one({"yo_username": friendToYo})):
+		active_friends_to_yo.remove(friendToYo)
 
-for listeningFriendToYo in friends_to_yo:
+for listeningFriendToYo in active_friends_to_yo:
 	#link = 'http://www.YoLunch.Me/yo_username/wantsToYoLunch/listeningFriedToYo'
 	#
 	#that site should contain 
@@ -68,12 +69,12 @@ for listeningFriendToYo in friends_to_yo:
 #http://www.YoLunch.Me/user1/confirmsLunchWith/user2
 
 #Removing complete listetning session
-sessions.remove("yo_username" : yo_username)
+sessions.remove({"yo_username" : yo_username})
 
 #Sending a finalizing Yo to both users
 
 #Yo to user1
-user2_facebook_ID = users.find_one({"_id": user2}, {'_id': False, 'facebook_user_ID': True})
+user2_facebook_ID = users.find_one({"_id": user2}, {'_id': False, 'facebook_user_ID': True})['facebook_user_ID']
 #link = 'http://www.YoLunch.Me/user1/lunches/user2'
 #
 #that site should contain 
@@ -81,7 +82,7 @@ user2_facebook_ID = users.find_one({"_id": user2}, {'_id': False, 'facebook_user
 #button_link = 'https://www.facebook.com/messages/user2_facebook_ID'
 
 #Yo to user2
-user1_facebook_ID = users.find_one({"_id": user1}, {'_id': False, 'facebook_user_ID': True})
+user1_facebook_ID = users.find_one({"_id": user1}, {'_id': False, 'facebook_user_ID': True})['facebook_user_ID']
 #link = 'http://www.YoLunch.Me/user2/lunches/user1'
 #
 #that site should contain 
