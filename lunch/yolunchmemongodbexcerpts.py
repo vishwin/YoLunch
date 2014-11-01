@@ -62,7 +62,9 @@ for listeningFriendToYo in active_friends_to_yo:
 	#
 	#that site should contain 
 	#yo_username wants to have a lunch with you
-	#button_link = 'http://www.YoLunch.Me/listeningFriedToYo/confirmsLunchWith/yo_username'
+	#button_link = 'http://www.YoLunch.Me/listeningFriedToYo/confirmsLunchWith/yo_username/lat/lon'
+	#warning: we need js to extract geolocation data here
+	#hopefully it will work: http://www.w3schools.com/html/html5_geolocation.asp
 
 
 #On receive a confirmation of lunch, i.e. a call to link
