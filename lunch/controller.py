@@ -20,26 +20,29 @@ def yo():
 
 @app.route('/register')
 def register():
-	return render_template('register.html', app_id=app.config['FB_APP'])
+	if request.args.get('code'):
+		auth=requests.get('https://graph.facebook.com/oauth/access_token?client_id={0}&redirect_uri=http://{1}/register&client_secret={2}&code={3}'.format(app.config['FB_APP'], app.config['LOCALHOST'], app.config['FB_APP_SECRET'], request.args.get('code')))
+		return auth.text
+	else:
+		return render_template('register.html', app_id=app.config['FB_APP'], localhost=app.config['LOCALHOST'])
 
 @app.route('/<user1>/wantsToLunch/<user2>/near/<latitude>/<longitude>')
 def wantsToLunch():
 	return user1 + ' wantsToLunch ' + user2 + ' near ' + latitude + ' ' + longitude
 
 @app.route('/<user1>/confirmsLunchWith/<user2>')
-def wantsToLunch():
+def wantsToLunch2():
 	return user1 + ' confirmsLunchWith ' + user2
 
 @app.route('/<user1>/lunches/<user2>')
-def wantsToLunch():
+def wantsToLunch3():
 	return user1 + ' lunches ' + user2
 
 @app.route('/<user1>/lunches/<user2>')
-def wantsToLunch():
+def wantsToLunch4():
 	return user1 + ' lunches ' + user2
 
 #Dummy comment
 @app.route('/done')
-def wantsToLunch():
+def wantsToLunch5():
 	return 'done'
-
