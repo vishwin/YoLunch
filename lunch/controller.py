@@ -28,11 +28,13 @@ def register():
 	if request.args.get('code') and request.args.get('state'):
 		auth=requests.get('https://graph.facebook.com/oauth/access_token', params={'client_id': app.config['FB_APP'], 'client_secret': app.config['FB_APP_SECRET'], 'code': request.args.get('code'), 'redirect_uri': 'http://' + app.config['LOCALHOST'] + '/register'})
 		fb_userdata=requests.get('https://graph.facebook.com/v2.2/me', params=auth.text)
+
 		users.insert({
 			'_id': request.args.get('state'), # Yo app username
 			'facebook_user_ID': fb_userdata.json()['id'],
 			'name': fb_userdata.json()['name'],
-			'facebook_token': urllib.parse.parse_qs(auth.text)['access_token'][0]
+			'facebook_token': urllib.parse.parse_qs(auth.text)['access_token'][0],
+			'facebook_expire': datetime.datetime.utcnow() + datetime(0, urllib.parse.parse_qs(auth.text)['expires'][0])
 		})
 		return 'OK'
 	else:
