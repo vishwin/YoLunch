@@ -1,0 +1,48 @@
+body {
+    background:  repeat #9B59B6;
+    font-family: 'Montserrat', arial, sans-serif;
+    color: white;
+    text-rendering: optimizeLegibility;
+    font-weight: 700;
+    width: 100%;
+    margin: 0px;
+}
+
+p{
+    text-transform: uppercase;
+}
+
+.content p{
+    font-size: 45px;
+    text-align: center;
+    margin: 0px;
+    padding-top: 22px;
+    padding-bottom: 22px;
+    background-color: #3498DB; 
+    width: 100%;
+}
+
+.reject p{
+    font-size: 45px;
+    text-align: center;
+    margin: 0px;
+    height: 89px;
+    line-height: 89px;
+    padding: 0px;
+    background-color: #e74c3c; 
+    width: 100%;
+}
+
+form{
+    margin: 0px;
+    width: 100%;
+}
+
+
+.footer p{
+    text-transform: capitalize;
+    bottom: 0px;
+    width: 100%;
+    text-align: center;
+    position: fixed;
+}
