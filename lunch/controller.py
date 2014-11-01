@@ -1,7 +1,8 @@
 from lunch import app
-from flask import redirect, request
+from flask import request, render_template
 import json
 import requests
+import pymongo
 
 def send_yo(username, link):
 	requests.post('http://api.justyo.co/yo/', data={'api_token': app.config['YO_API'], 'username': username, 'link': link})
@@ -14,5 +15,9 @@ def tsst():
 # Yo callback
 def yo():
 	username=request.args.get('username')
-	send_yo(username, 'https://www.facebook.com/dialog/oauth?client_id={0}&redirect_uri=https://www.facebook.com/connect/login_success.html&scope=user_friends'.format(app.config['FB_APP']))
+	send_yo(username, 'http://{0}/register'.format(app.config['LOCALHOST']))
 	return 'OK'
+
+@app.route('/register')
+def register():
+	return render_template('register.html', app_id=app.config['FB_APP'])
