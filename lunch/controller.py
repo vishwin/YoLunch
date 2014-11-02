@@ -91,7 +91,7 @@ def yo():
 				active_friends_to_yo.append(friendToYo)
 
 		for listeningFriendToYo in active_friends_to_yo:
-			send_yo(listeningFriendTo, 'http://{0}/{1}/wantsToLunch/{2}'.format(app.config['LOCALHOST'], username, listeningFriendToYo))
+			send_yo(listeningFriendToYo, 'http://{0}/{1}/wantsToLunch/{2}'.format(app.config['LOCALHOST'], username, listeningFriendToYo))
 			#link = 'http://www.YoLunch.Me/yo_username/wantsToYoLunch/listeningFriedToYo'
 			#
 			#that site should contain 
