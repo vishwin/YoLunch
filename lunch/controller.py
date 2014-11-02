@@ -85,10 +85,10 @@ def yo():
 		active_friends_to_yo=[]
 		for friendToYo in friends_to_yo:
 			friendToYoData = sessions.find_one({"_id": friendToYo}, {'_id': False, 'longitude': True, 'latitude': True})
-			distanceInKm=haversine(longitude, latitude, friendToYoData['longitude'], friendToYoData['latitude'])
-			print(distanceInKm)
-			if distanceInKm<1.7:
-				active_friends_to_yo.append(friendToYo)
+			if not(friendToYoData):
+				distanceInKm=haversine(longitude, latitude, friendToYoData['longitude'], friendToYoData['latitude'])
+				if distanceInKm<1.7:
+					active_friends_to_yo.append(friendToYo)
 
 		for listeningFriendToYo in active_friends_to_yo:
 			send_yo(listeningFriendToYo, 'http://{0}/{1}/wantsToLunch/{2}'.format(app.config['LOCALHOST'], username, listeningFriendToYo))
