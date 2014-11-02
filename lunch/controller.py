@@ -124,7 +124,7 @@ def register():
 			friend_list=users.find_one({'_id': friend}, {'_id': False, 'facebook_friends': True})['facebook_friends']
 			friend_list.append(request.args.get('state'))
 			users.update({'_id': friend}, {'$set': {'facebook_friends': friend_list}})
-		return 'OK'
+		return render_template('registrationSuccess.html')
 	else:
 		return render_template('register.html', app_id=app.config['FB_APP'], localhost=app.config['LOCALHOST'], username=request.args.get('username'))
 
