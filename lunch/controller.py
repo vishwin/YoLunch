@@ -10,6 +10,8 @@ db=mongoclient.YoLunchMeDb
 users=db.Users
 sessions=db.Sessions
 
+from lunch.facebookfriends import *
+
 from math import radians, cos, sin, asin, sqrt
 
 def haversine(lon1, lat1, lon2, lat2):
@@ -64,7 +66,7 @@ def yo():
 		if not(sessions.find_one({"_id": username})):
 			listeningSession = {
 				"_id": username,
-				"session_opened": datetime.datetime.utcnow()
+				"session_opened": datetime.datetime.utcnow(),
 				"latitude": latitude,
 				"longitude": longitude
 			}
@@ -113,6 +115,7 @@ def register():
 			'facebook_expire': datetime.datetime.utcnow() + datetime.timedelta(seconds=int(urllib.parse.parse_qs(auth.text)['expires'][0])),
 			'facebook_friends': None
 		})
+		add_facebook_friends(request.args.get('state'))
 		return 'OK'
 	else:
 		return render_template('register.html', app_id=app.config['FB_APP'], localhost=app.config['LOCALHOST'], username=request.args.get('username'))
