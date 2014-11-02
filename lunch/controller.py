@@ -80,17 +80,14 @@ def yo():
 				}}
 			)
 
-		#Sending yo to all the friends in the listetning session
-		friends_to_yo = users.find_one({"_id": username}, {'_id': False, 'friends_to_yo': True})['friends_to_yo']
-		active_friends_to_yo = list(friends_to_yo)
+		#Sending yo to all the friends in the listening session
+		friends_to_yo = users.find_one({"_id": username}, {'_id': False, 'facebook_friends': True})['facebook_friends']
+		active_friends_to_yo=[]
 		for friendToYo in friends_to_yo:
 			friendToYoData = sessions.find_one({"_id": friendToYo}, {'_id': False, 'longitude': True, 'latitude': True})
-			#FIXME logical flaw not(not())?
-			if not(not(friendToYoData)):
-				distanceInKm = haversine(longitude, latitude, friendToYoData['longitude'], friendToYoData['latitude'])
-				if distanceInKm < 1.7:
-					active_friends_to_yo.remove(friendToYo)
-			
+			distanceInKm=haversine(longitude, latitude, friendToYoData['longitude'], friendToYoData['latitude'])
+			if distanceInKm<1.7:
+				active_friends_to_yo.append(friendToYo)
 
 		for listeningFriendToYo in active_friends_to_yo:
 			send_yo(username, 'http://{0}/{1}/wantsToYoLunch/{2}'.format(app.config['LOCALHOST'], username, listeningFriendToYo))
