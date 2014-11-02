@@ -52,7 +52,7 @@ def tsst():
 def yo():
 	username=request.args.get('username')
 
-	if not(users.find_one({"_id": yo_username})):
+	if not(users.find_one({"_id": username})):
 		send_yo(username, 'http://{0}/register?username={1}'.format(app.config['LOCALHOST'], username))
 	else:
 		location=request.args.get('location').split(';')
