@@ -44,8 +44,8 @@ def cleanExpiredSessions():
 
 #All the routes
 @app.route('/')
-def tsst():
-	return 'Tsst!'
+def hauptseite():
+	return render_template('MainPage.html')
 
 @app.route('/yo')
 # Yo callback
