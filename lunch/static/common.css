@@ -6,9 +6,8 @@ body {
         margin: 0;
         padding: 0;
         color: #FFFFFF;
-        font-size: 30px;
+        font-size: 29px;
         text-transform: uppercase;
-	background-color: #9B58B6;
 }
 
 section, div, header, a {
@@ -18,6 +17,10 @@ section, div, header, a {
 section p, div p, header p, a p {
 	display: inline-block;
 	vertical-align: middle;
+}
+a {
+	text-decoration: none;
+	color: #FFFFFF;
 }
 a:hover, a:active {
 	text-decoration: none;
