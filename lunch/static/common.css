@@ -8,18 +8,24 @@ body {
         color: #FFFFFF;
         font-size: 30px;
         text-transform: uppercase;
+	background-color: #9B58B6;
 }
 
-section, div, header {
+section, div, header, a {
+	display: block;
         min-height: 89px;
         position: relative;
 }
-section p, div p, header p {
+section p, div p, header p, a p {
         margin: 0;
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+}
+a:hover, a:active {
+	text-decoration: none;
+	color: #FFFFFF;
 }
 
 .turquoise {
