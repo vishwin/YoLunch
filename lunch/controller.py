@@ -117,7 +117,8 @@ def register():
 			'facebook_user_ID': fb_userdata.json()['id'],
 			'name': fb_userdata.json()['name'],
 			'facebook_token': urllib.parse.parse_qs(auth.text)['access_token'][0],
-			'facebook_expire': datetime.datetime.utcnow() + datetime.timedelta(seconds=int(urllib.parse.parse_qs(auth.text)['expires'][0]))
+			'facebook_expire': datetime.datetime.utcnow() + datetime.timedelta(seconds=int(urllib.parse.parse_qs(auth.text)['expires'][0])),
+			'facebook_friends': None
 		})
 		return 'OK'
 	else:
