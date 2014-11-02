@@ -8,16 +8,18 @@ body {
         color: #FFFFFF;
         font-size: 29px;
         text-transform: uppercase;
+	background-color: #9B59B6;
 }
 
-section, div, header, a {
+section, div, header {
         min-height: 89px;
 	text-align: center;
 }
-section p, div p, header p, a p {
+section p, div p, header p {
 	display: inline-block;
 	vertical-align: middle;
 }
+
 a {
 	text-decoration: none;
 	color: #FFFFFF;
