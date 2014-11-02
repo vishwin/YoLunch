@@ -1,21 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<link href="/static/ReceivedRequest.css" rel="stylesheet">
+	<title>YoLunchMe</title>
+	<link href="/static/common.css" rel="stylesheet">
 	<link rel="shortcut icon" href="https://yoapp.s3.amazonaws.com/yo/favicon.ico">
 </head>
 <body>
-	<div class="text">
-		<p>Yo! {{ user_name }} accepts your lunch request</p>
-	</div>
-	<div class="option1">
-		<a href="https://www.facebook.com/app_scoped_user_id/{{ user_facebook_ID }}/"><p>Connect on Facebook</p></a>
-	</div>
-	<div class="option2">
-		<a href=""><p>Pick a restaurant on Yelp</p></a>
-	</div>
-	<div class="footer">
-        <p>#Yo Lunch Me#</p>
-    </div>
+<header class="alizarin">
+	<p>Yo! {{ user_name }} accepts your lunch request</p>
+</header>
+<section class="emerald">
+	<p><a href="https://www.facebook.com/app_scoped_user_id/{{ user_facebook_ID }}/">Connect on Facebook</a></p>
+</section>
 </body>
 </html>
