@@ -85,7 +85,7 @@ def yo():
 		active_friends_to_yo=[]
 		for friendToYo in friends_to_yo:
 			friendToYoData = sessions.find_one({"_id": friendToYo}, {'_id': False, 'longitude': True, 'latitude': True})
-			if not(friendToYoData):
+			if not(not(friendToYoData)):
 				distanceInKm=haversine(longitude, latitude, friendToYoData['longitude'], friendToYoData['latitude'])
 				if distanceInKm<1.7:
 					active_friends_to_yo.append(friendToYo)
