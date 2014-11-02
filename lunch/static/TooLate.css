@@ -1,0 +1,26 @@
+body {
+	background-color: #9B59B6;
+	margin: 0px;
+}
+.text p{
+	text-transform: uppercase;
+	background-color: #e74c3c;
+	height: 178px;
+	line-height: 178px;
+	font-family: 'Montserrat', arial, sans-serif;
+	color: white;
+	font-size: 90px;
+	font-weight: 700;
+	text-align: center;
+	width: 100%;
+	margin: 0px;
+}
+.footer p{
+    text-transform: capitalize;
+    bottom: 0px;
+    width: 100%;
+    color: white;
+    font-weight: normal;
+    text-align: center;
+    position: fixed;
+}
