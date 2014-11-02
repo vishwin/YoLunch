@@ -3,7 +3,7 @@ body {
     font-family: 'Montserrat', arial, sans-serif;
     color: white;
     text-rendering: optimizeLegibility;
-    font-weight: 700;
+    font-weight: bolder;
     width: 100%;
     margin: 0px;
 }
@@ -13,25 +13,33 @@ p{
 }
 
 .content p{
-    font-size: 45px;
+    font-size: 90px;
     text-align: center;
     margin: 0px;
-    padding-top: 22px;
-    padding-bottom: 22px;
+    padding-top: 44px;
+    padding-bottom: 44px;
     background-color: #3498DB; 
     width: 100%;
 }
 
+
 .reject p{
-    font-size: 45px;
+    font-size: 90px;
     text-align: center;
     margin: 0px;
-    height: 89px;
-    line-height: 89px;
+    height: 178px;
+    line-height: 178px;
     padding: 0px;
     background-color: #e74c3c; 
     width: 100%;
 }
+
+.reject a{
+    text-decoration: none;
+    color: white;
+}
+
+
 
 form{
     margin: 0px;
@@ -40,9 +48,11 @@ form{
 
 
 .footer p{
+    font-weight: normal;
     text-transform: capitalize;
     bottom: 0px;
     width: 100%;
+    
     text-align: center;
     position: fixed;
 }
