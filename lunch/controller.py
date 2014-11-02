@@ -138,7 +138,7 @@ def wantsToLunch(user1, user2):
 @app.route('/<user2>/confirmsLunchWith/<user1>')
 def confirmsLunchWith(user1, user2):
 	if not(sessions.find_one({"_id": user1})) or not(sessions.find_one({"_id": user2})):
-		return 'Too late, that lunch is already taken!'
+		return render_template('TooLate.html')
 	else:
 		#Removing complete listetning session
 		sessions.remove({"_id" : user1})
