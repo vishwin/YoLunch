@@ -5,9 +5,9 @@
 <link rel="shortcut icon" href="https://yoapp.s3.amazonaws.com/yo/favicon.ico">
 <body>
     <div class="content">
-        <p>Adam Golinski wants to have a lunch with you</p>
+        <p>{{ user_name }} wants to have a lunch with you</p>
 
-        <form id="YoForm" action="http://YoLunch.Me/user_receiving/wantsToLunch/adamgol/" method="post">
+        <form id="YoForm" action="http://YoLunch.Me/{{ user2 }}/wantsToLunch/{{ user1 }}/" method="post">
             <input type="submit" value="YO BACK " style="background-color: #2ecc71; border: none; height: 178px; width: 100%; font-size:90px; vertical-align: 9px; color: #ffffff; box-shadow: none; font-weight: bolder" />
         </form>
         

@@ -2,6 +2,7 @@ from lunch import app
 from flask import request, render_template
 import requests
 import urllib.parse, datetime
+from lunch.facebookfriends import *
 
 import pymongo
 mongoclient=pymongo.MongoClient()
@@ -41,8 +42,9 @@ def cleanExpiredSessions():
 
 #updating the list of the friends_to_yo
 def updateFacebookFriendsList(yo_username):
-	friends_to_yo = [] #this list should contain the yo_usernames
-	#here comes the fun FB part
+	 = users.find_one({"_id": yo_username})
+
+	friends_to_yo = get_facebook_friends(url)
 	users.update({"_id": yo_username}, 
 		{"$set": {"friends_to_yo": friends_to_yo}})
 
@@ -132,17 +134,20 @@ def register():
 @app.route('/<user1>/wantsToLunch/<user2>')
 def wantsToLunch(user1, user2):
 	if not(sessions.find_one({"_id": user1})) or not(sessions.find_one({"_id": user2})):
-		return 'Too late, that lunch is already taken!'
-	else
-		return user1 + ' wantsToLunch ' + user2 + ': <a href="' 
-		+ 'http://{0}/{1}/confirmsLunchWith/{2}'.format(app.config['LOCALHOST'], user2, user1) 
-		+ '">link</a>'
+		#return 'Too late, that lunch is already taken!'
+		return render_template('TooLate.html')
+	else:
+		user1_data = users.find_one({"_id": user1}, {'_id': False, 'facebook_user_ID': True, 'name': True})
+		#return user1 + ' wantsToLunch ' + user2 + ': <a href="' 
+		#+ 'http://{0}/{1}/confirmsLunchWith/{2}'.format(app.config['LOCALHOST'], user2, user1) 
+		#+ '">link</a>'
+		return render_template('NewLunchRequest.html', localhost=app.config['LOCALHOST'], user_name=user1_data['name'], user2=user2, user1=user1)
 
 @app.route('/<user2>/confirmsLunchWith/<user1>')
 def confirmsLunchWith(user1, user2):
 	if not(sessions.find_one({"_id": user1})) or not(sessions.find_one({"_id": user2})):
 		return 'Too late, that lunch is already taken!'
-	else
+	else:
 		#Removing complete listetning session
 		sessions.remove({"_id" : user1})
 		sessions.remove({"_id" : user2})
@@ -169,9 +174,10 @@ def confirmsLunchWith(user1, user2):
 		#+ 'http://{0}/{1}/confirmsLunchWith/{2}'.format(app.config['LOCALHOST'], user2, user1) 
 		#+ '">link</a>'
 		user1_data = users.find_one({"_id": user1}, {'_id': False, 'facebook_user_ID': True, 'name': True})
-		return 'Awesome! You are going to have a lunch with ' + user_data['name'] 
-		+ '! <a href="https://www.facebook.com/messages/{0}'.format(user_data['facebook_user_ID']) 
-		+ '">Message him on facebook!</a>'
+		#return 'Awesome! You are going to have a lunch with ' + user1_data['name'] 
+		#+ '! <a href="https://www.facebook.com/messages/{0}'.format(user1_data['facebook_user_ID']) 
+		#+ '">Message him on facebook!</a>'
+		return render_template('ReceivedRequest.html', localhost=app.config['LOCALHOST'], user_name=user1_data['name'], user_facebook_ID = user1_data['facebook_user_ID'])
 
 #link = 'http://www.YoLunch.Me/youLunch/user'
 #
@@ -181,9 +187,10 @@ def confirmsLunchWith(user1, user2):
 @app.route('/youLunch/<user>')
 def youLunch(user):
 	user_data = users.find_one({"_id": user}, {'_id': False, 'facebook_user_ID': True, 'name': True})
-	return 'Awesome! You are going to have a lunch with ' + user_data['name'] 
-	+ '! <a href="https://www.facebook.com/messages/{0}'.format(user_data['facebook_user_ID']) 
-	+ '">Message him on facebook!</a>'
+	#return 'Awesome! You are going to have a lunch with ' + user_data['name'] 
+	#+ '! <a href="https://www.facebook.com/messages/{0}'.format(user_data['facebook_user_ID']) 
+	#+ '">Message him on facebook!</a>'
+	return render_template('ReceivedRequest.html', localhost=app.config['LOCALHOST'], user_name=user_data['name'], user_facebook_ID = user_data['facebook_user_ID'])
 
 @app.route('/done')
 def done():
