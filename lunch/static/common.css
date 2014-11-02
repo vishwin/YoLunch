@@ -12,16 +12,12 @@ body {
 }
 
 section, div, header, a {
-	display: block;
         min-height: 89px;
-        position: relative;
+	text-align: center;
 }
 section p, div p, header p, a p {
-        margin: 0;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+	display: inline-block;
+	vertical-align: middle;
 }
 a:hover, a:active {
 	text-decoration: none;
