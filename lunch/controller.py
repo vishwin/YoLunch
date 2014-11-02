@@ -40,15 +40,6 @@ def cleanExpiredSessions():
 	for expiredSession in sessions.find({"session_opened": {"$lt": expiredDateTime}}):
 		sessions.remove(expiredSession)
 
-#updating the list of the friends_to_yo
-def updateFacebookFriendsList(yo_username):
-	 = users.find_one({"_id": yo_username})
-
-	friends_to_yo = get_facebook_friends(url)
-	users.update({"_id": yo_username}, 
-		{"$set": {"friends_to_yo": friends_to_yo}})
-
-
 #All the routes
 @app.route('/')
 def tsst():
@@ -195,10 +186,3 @@ def youLunch(user):
 @app.route('/done')
 def done():
 	return 'done'
-
-#Refresh facebook friends
-@app.route('/refreshfacebookfriends')
-def refreshfacebookfriends():
-	for user in users.find():
-		updateFacebookFriendsList(user['_id'])
-	return 'OK'
