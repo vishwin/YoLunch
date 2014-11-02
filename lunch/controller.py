@@ -82,11 +82,15 @@ def yo():
 
 		#Sending yo to all the friends in the listening session
 		friends_to_yo = users.find_one({"_id": username}, {'_id': False, 'facebook_friends': True})['facebook_friends']
+		print(friends_to_yo)
 		active_friends_to_yo=[]
 		for friendToYo in friends_to_yo:
+			print(friendToYo)
 			friendToYoData = sessions.find_one({"_id": friendToYo}, {'_id': False, 'longitude': True, 'latitude': True})
+			print(friendToYoData)
 			if not(not(friendToYoData)):
 				distanceInKm=haversine(longitude, latitude, friendToYoData['longitude'], friendToYoData['latitude'])
+				print(distanceInKm)
 				if distanceInKm<1.7:
 					active_friends_to_yo.append(friendToYo)
 
