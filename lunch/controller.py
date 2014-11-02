@@ -184,9 +184,13 @@ def youLunch(user):
 	+ '! <a href="https://www.facebook.com/messages/{0}'.format(user_data['facebook_user_ID']) 
 	+ '">Message him on facebook!</a>'
 
-#Dummy comment
 @app.route('/done')
-def wantsToLunch5():
+def done():
 	return 'done'
 
-
+#Refresh facebook friends
+@app.route('/refreshfacebookfriends')
+def refreshfacebookfriends():
+	for user in users.find():
+		updateFacebookFriendsList(user['_id'])
+	return 'OK'
