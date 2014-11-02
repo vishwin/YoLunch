@@ -194,6 +194,6 @@ def youLunch(user):
 	#+ '">Message him on facebook!</a>'
 	return render_template('ReceivedRequest.html', localhost=app.config['LOCALHOST'], user_name=user_data['name'], user_facebook_ID = user_data['facebook_user_ID'])
 
-@app.route('/done')
-def done():
-	return 'done'
+@app.route('/ignore')
+def ignore():
+	return render_template('requestIgnore.html')
