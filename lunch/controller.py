@@ -143,7 +143,7 @@ def wantsToLunch(user1, user2):
 		#return user1 + ' wantsToLunch ' + user2 + ': <a href="' 
 		#+ 'http://{0}/{1}/confirmsLunchWith/{2}'.format(app.config['LOCALHOST'], user2, user1) 
 		#+ '">link</a>'
-		return render_template('NewLunchRequest.html', localhost=app.config['LOCALHOST'], user_name=user1_data['name'], user2=user2, user1=user1)
+		return render_template('newNewLunchRequest.html', localhost=app.config['LOCALHOST'], user_name=user1_data['name'], user2=user2, user1=user1)
 
 @app.route('/<user2>/confirmsLunchWith/<user1>')
 def confirmsLunchWith(user1, user2):
