@@ -3,15 +3,51 @@ from flask import request, render_template
 import requests
 import urllib.parse, datetime
 
-def send_yo(username, link):
-	requests.post('http://api.justyo.co/yo/', data={'api_token': app.config['YO_API'], 'username': username, 'link': link})
-
 import pymongo
 mongoclient=pymongo.MongoClient()
 db=mongoclient.YoLunchMeDb
 users=db.Users
 sessions=db.Sessions
 
+from math import radians, cos, sin, asin, sqrt
+
+def haversine(lon1, lat1, lon2, lat2):
+    """
+    Calculate the great circle distance between two points 
+    on the earth (specified in decimal degrees)
+    """
+    # convert decimal degrees to radians 
+    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+    # haversine formula 
+    dlon = lon2 - lon1 
+    dlat = lat2 - lat1 
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * asin(sqrt(a)) 
+
+    # 6367 km is the radius of the Earth
+    km = 6367 * c
+    return km 
+
+def send_yo(username, link):
+	requests.post('http://api.justyo.co/yo/', data={'api_token': app.config['YO_API'], 'username': username, 'link': link})
+
+#Removing expired listening sessions
+def cleanExpiredSessions():
+	timedelta = datetime.timedelta(0, 1800)
+	expiredDateTime = datetime.datetime.utcnow() - timedelta
+	for expiredSession in sessions.find({"session_opened": {"$lt": expiredDateTime}}):
+		sessions.remove(expiredSession)
+
+#updating the list of the friends_to_yo
+def updateFacebookFriendsList(yo_username):
+	friends_to_yo = [] #this list should contain the yo_usernames
+	#here comes the fun FB part
+	users.update({"_id": yo_username}, 
+		{"$set": {"friends_to_yo": friends_to_yo}})
+
+
+#All the routes
 @app.route('/')
 def tsst():
 	return 'Tsst!'
@@ -20,7 +56,54 @@ def tsst():
 # Yo callback
 def yo():
 	username=request.args.get('username')
-	send_yo(username, 'http://{0}/register?username={1}'.format(app.config['LOCALHOST'], username))
+
+	if not(users.find_one({"_id": yo_username})):
+		send_yo(username, 'http://{0}/register?username={1}'.format(app.config['LOCALHOST'], username))
+	else:
+		location=request.args.get('location').split(';')
+		latitude=float(location[0])
+		longitude=float(location[1])
+
+		#Clean expired sessions
+		cleanExpiredSessions()
+
+		#Inserting listening session
+		if not(sessions.find_one({"_id": username})):
+			listeningSession = {
+				"_id": username,
+				"session_opened": datetime.datetime.utcnow()
+				"latitude": latitude,
+				"longitude": longitude
+			}
+			sessions.insert(listeningSession);
+		else:
+			sessions.update({"_id": username}, 
+				{"$set": {
+					"session_opened": datetime.datetime.utcnow(),
+					"latitude": latitude,
+					"longitude": longitude
+				}}
+			)
+
+		#Sending yo to all the friends in the listetning session
+		friends_to_yo = users.find_one({"_id": username}, {'_id': False, 'friends_to_yo': True})['friends_to_yo']
+		active_friends_to_yo = list(friends_to_yo)
+		for friendToYo in friends_to_yo:
+			friendToYoData = sessions.find_one({"_id": friendToYo}, {'_id': False, 'longitude': True, 'latitude': True})
+			#FIXME logical flaw not(not())?
+			if not(not(friendToYoData)):
+				distanceInKm = haversine(longitude, latitude, friendToYoData['longitude'], friendToYoData['latitude'])
+				if distanceInKm < 1.7:
+					active_friends_to_yo.remove(friendToYo)
+			
+
+		for listeningFriendToYo in active_friends_to_yo:
+			send_yo(username, 'http://{0}/{1}/wantsToYoLunch/{2}'.format(app.config['LOCALHOST'], username, listeningFriendToYo))
+			#link = 'http://www.YoLunch.Me/yo_username/wantsToYoLunch/listeningFriedToYo'
+			#
+			#that site should contain 
+			#yo_username wants to have a lunch with you
+			#button_link = 'http://www.YoLunch.Me/listeningFriedToYo/confirmsLunchWith/yo_username'
 	return 'OK'
 
 @app.route('/register')
@@ -40,19 +123,70 @@ def register():
 	else:
 		return render_template('register.html', app_id=app.config['FB_APP'], localhost=app.config['LOCALHOST'], username=request.args.get('username'))
 
-@app.route('/<user1>/wantsToLunch/<user2>/near/<latitude>/<longitude>')
-def wantsToLunch(user1, user2, latitude, longitude):
-	return user1 + ' wantsToLunch ' + user2 + ' near ' + latitude + ' ' + longitude
+#link = 'http://www.YoLunch.Me/yo_username/wantsToYoLunch/listeningFriedToYo'
+#
+#that site should contain 
+#yo_username wants to have a lunch with you
+#button_link = 'http://www.YoLunch.Me/listeningFriendToYo/confirmsLunchWith/yo_username'
+@app.route('/<user1>/wantsToLunch/<user2>')
+def wantsToLunch(user1, user2):
+	if not(sessions.find_one({"_id": user1})) or not(sessions.find_one({"_id": user2})):
+		return 'Too late, that lunch is already taken!'
+	else
+		return user1 + ' wantsToLunch ' + user2 + ': <a href="' 
+		+ 'http://{0}/{1}/confirmsLunchWith/{2}'.format(app.config['LOCALHOST'], user2, user1) 
+		+ '">link</a>'
 
-@app.route('/<user1>/confirmsLunchWith/<user2>')
-def wantsToLunch2(user1, user2):
-	return user1 + ' confirmsLunchWith ' + user2
+@app.route('/<user2>/confirmsLunchWith/<user1>')
+def confirmsLunchWith(user1, user2):
+	if not(sessions.find_one({"_id": user1})) or not(sessions.find_one({"_id": user2})):
+		return 'Too late, that lunch is already taken!'
+	else
+		#Removing complete listetning session
+		sessions.remove({"_id" : user1})
+		sessions.remove({"_id" : user2})
 
-@app.route('/<user1>/lunches/<user2>')
-def wantsToLunch4(user1, user2):
-	return user1 + ' lunches ' + user2
+		#Sending a finalizing Yo to both users
+
+		#Yo to user1
+
+		send_yo(user1, 'http://{0}/youLunch/{1}'.format(app.config['LOCALHOST'], user2))
+		#link = 'http://www.YoLunch.Me/youLunch/user2'
+		#
+		#that site should contain 
+		#You're having YoLunch with user2
+		#button_link = 'https://www.facebook.com/messages/user2_facebook_ID'
+
+		#Yo to user2
+		#send_yo(user2, 'http://{0}/youLunch/{1}'.format(app.config['LOCALHOST'], user1))
+		#link = 'http://www.YoLunch.Me/youLunch/user1'
+		#
+		#that site should contain 
+		#You're having YoLunch with user2
+		#button_link = 'https://www.facebook.com/messages/user1_facebook_ID'
+		#return user1 + ' confirmsLunchWith ' + user2 + ': <a href="' 
+		#+ 'http://{0}/{1}/confirmsLunchWith/{2}'.format(app.config['LOCALHOST'], user2, user1) 
+		#+ '">link</a>'
+		user1_data = users.find_one({"_id": user1}, {'_id': False, 'facebook_user_ID': True, 'name': True})
+		return 'Awesome! You are going to have a lunch with ' + user_data['name'] 
+		+ '! <a href="https://www.facebook.com/messages/{0}'.format(user_data['facebook_user_ID']) 
+		+ '">Message him on facebook!</a>'
+
+#link = 'http://www.YoLunch.Me/youLunch/user'
+#
+#that site should contain 
+#You're having YoLunch with user
+#button_link = 'https://www.facebook.com/messages/user_facebook_ID'
+@app.route('/youLunch/<user>')
+def youLunch(user):
+	user_data = users.find_one({"_id": user}, {'_id': False, 'facebook_user_ID': True, 'name': True})
+	return 'Awesome! You are going to have a lunch with ' + user_data['name'] 
+	+ '! <a href="https://www.facebook.com/messages/{0}'.format(user_data['facebook_user_ID']) 
+	+ '">Message him on facebook!</a>'
 
 #Dummy comment
 @app.route('/done')
 def wantsToLunch5():
 	return 'done'
+
+

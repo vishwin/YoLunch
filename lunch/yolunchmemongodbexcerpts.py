@@ -36,20 +36,25 @@ users.update({"_id": yo_username},
 
 
 #Removing expired listening sessions
-timedelta = datetime.timedelta(0, 1800)
-expiredDateTime = datetime.datetime.utcnow() - timedelta
-for expiredSession in sessions.find({"session_opened": {"$lt": expiredDateTime}}):
-	sessions.remove(expiredSession)
+def cleanExpiredSessions():
+	timedelta = datetime.timedelta(0, 1800)
+	expiredDateTime = datetime.datetime.utcnow() - timedelta
+	for expiredSession in sessions.find({"session_opened": {"$lt": expiredDateTime}}):
+		sessions.remove(expiredSession)
 
 
 #On receive an registered user first Yo command
 
+cleanExpiredSessions()
 #Inserting listening session
-listeningSession = {
-	"_id": yo_username,
-	"session_opened": datetime.datetime.utcnow()
-}
-sessions.insert(listeningSession);
+if not(sessions.find_one({"_id": yo_username})):
+	listeningSession = {
+		"_id": yo_username,
+		"session_opened": datetime.datetime.utcnow()
+	}
+	sessions.insert(listeningSession);
+else:
+	sessions.update({"_id": yo_username}, {"$set": {"session_opened": datetime.datetime.utcnow()}})
 
 #Sending yo to all the friends in the listetning session
 friends_to_yo = users.find_one({"_id": yo_username}, {'_id': False, 'friends_to_yo': True})['friends_to_yo']
